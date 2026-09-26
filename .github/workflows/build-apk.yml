@@ -29,14 +29,13 @@ jobs:
           cp -r lib /tmp/backup_lib
           cp pubspec.yaml /tmp/backup_pubspec.yaml
           cp -r android/app/src/main/res /tmp/backup_res
-          # Delete the incompatible hand-written android/ folder first:
-          # flutter create never overwrites existing files.
           rm -rf android
           flutter create . --org com.gapshap --project-name app --platforms=android
           rm -rf lib && cp -r /tmp/backup_lib lib
           cp /tmp/backup_pubspec.yaml pubspec.yaml
           rm -rf android/app/src/main/res && cp -r /tmp/backup_res android/app/src/main/res
           python3 - <<'EOF'
+          import os
           p = 'android/app/src/main/AndroidManifest.xml'
           s = open(p).read()
           s = s.replace('android:label="app"', 'android:label="GapShap"')
@@ -46,6 +45,13 @@ jobs:
                   '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.INTERNET"/>')
           open(p, 'w').write(s)
           print('manifest patched')
+          for p2 in ['android/app/build.gradle.kts', 'android/app/build.gradle']:
+              if os.path.exists(p2):
+                  s2 = open(p2).read()
+                  s2 = s2.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 34')
+                  s2 = s2.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 34')
+                  open(p2, 'w').write(s2)
+                  print('patched', p2)
           EOF
 
       - name: Install dependencies
