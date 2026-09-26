@@ -13,12 +13,22 @@ class AuthService {
   Future<void> sendOtp({
     required String phoneNumber,
     required Function(String verificationId) onCodeSent,
+    Function()? onAutoVerified,
     required Function(String error) onError,
   }) async {
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
+        // Test number ya auto-verification: foran sign-in, OTP screen nahi aati
+        try {
+          final result = await _auth.signInWithCredential(credential);
+          if (result.user != null) {
+            await _saveUser(result.user!);
+            onAutoVerified?.call();
+          }
+        } catch (e) {
+          onError('Auto login mein masla hua');
+        }
       },
       verificationFailed: (FirebaseAuthException e) {
         onError(e.message ?? 'OTP bhejne mein masla hua');
