@@ -65,7 +65,7 @@ jobs:
 
       - name: Patch plugin compileSdk to 36
         run: |
-          find "$HOME/.pub-cache/hosted" -name build.gradle -exec sed -i 's/flutter.compileSdkVersion/36/g; s/compileSdkVersion 33/compileSdkVersion 36/g' {} +
+          find "$HOME/.pub-cache/hosted" -name build.gradle -exec sed -i 's/flutter.compileSdkVersion/36/g; s/compileSdkVersion 3[0-9]/compileSdkVersion 36/g; s/compileSdk 3[0-9]/compileSdk 36/g' {} +
           echo "--- firebase_auth compileSdk now: ---"
           grep -h "compileSdk" "$HOME/.pub-cache/hosted/pub.dev/firebase_auth-"*/android/build.gradle
 
