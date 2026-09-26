@@ -69,11 +69,11 @@ jobs:
           echo "--- firebase_auth compileSdk now: ---"
           grep -h "compileSdk" "$HOME/.pub-cache/hosted/pub.dev/firebase_auth-"*/android/build.gradle
 
-      - name: Build debug APK
-        run: flutter build apk --debug
+      - name: Build release APK
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: gapshap-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
