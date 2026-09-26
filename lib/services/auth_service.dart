@@ -5,6 +5,9 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // Aakhri login/OTP error (diagnostic ke liye)
+  static String? lastError;
+
   Stream<User?> get authState => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
@@ -40,11 +43,12 @@ class AuthService {
     );
   }
 
-  // OTP verify karein
+  // OTP verify karein — true = kamyab, false = nakam (wajah lastError mein)
   Future<bool> verifyOtp({
     required String verificationId,
     required String otp,
   }) async {
+    lastError = null;
     try {
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
@@ -55,8 +59,13 @@ class AuthService {
         await _saveUser(result.user!);
         return true;
       }
+      lastError = 'Server ne khaali jawab diya';
       return false;
-    } catch (_) {
+    } on FirebaseAuthException catch (e) {
+      lastError = '${e.code}\n${e.message ?? ''}';
+      return false;
+    } catch (e) {
+      lastError = e.toString();
       return false;
     }
   }
