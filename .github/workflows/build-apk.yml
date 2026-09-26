@@ -35,7 +35,7 @@ jobs:
           cp /tmp/backup_pubspec.yaml pubspec.yaml
           rm -rf android/app/src/main/res && cp -r /tmp/backup_res android/app/src/main/res
           python3 - <<'EOF'
-          import os
+          import os, re
           p = 'android/app/src/main/AndroidManifest.xml'
           s = open(p).read()
           s = s.replace('android:label="app"', 'android:label="GapShap"')
@@ -48,8 +48,8 @@ jobs:
           for p2 in ['android/app/build.gradle.kts', 'android/app/build.gradle']:
               if os.path.exists(p2):
                   s2 = open(p2).read()
-                  s2 = s2.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 36')
-                  s2 = s2.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 36')
+                                    s2 = re.sub('compileSdk *=.*', 'compileSdk  = 36', s2)
+                                    s2 = re.sub('compileSdkVersion .*', 'compileSdkVersion 36', s2)
                   open(p2, 'w').write(s2)
                   print('patched', p2)
           EOF
