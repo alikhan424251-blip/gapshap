@@ -29,7 +29,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       phoneNumber: fullPhone,
       onCodeSent: (verificationId) {
         setState(() => _loading = false);
-        Navigator.push(
+        // pushReplacement: puraani OTP screen kabhi stack nahi hogi (stale code se bachein)
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (_) => OtpScreen(verificationId: verificationId, phone: fullPhone),

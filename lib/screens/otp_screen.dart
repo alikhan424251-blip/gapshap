@@ -33,8 +33,13 @@ class _OtpScreenState extends State<OtpScreen> {
         (_) => false,
       );
     } else if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('OTP ghalat hai, dobara koshish karein')));
+      final err = AuthService.lastError;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(err ?? 'OTP ghalat hai, dobara koshish karein'),
+          duration: const Duration(seconds: 8),
+        ),
+      );
     }
   }
 
