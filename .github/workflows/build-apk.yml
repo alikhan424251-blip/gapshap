@@ -29,6 +29,9 @@ jobs:
           cp -r lib /tmp/backup_lib
           cp pubspec.yaml /tmp/backup_pubspec.yaml
           cp -r android/app/src/main/res /tmp/backup_res
+          # Delete the incompatible hand-written android/ folder first:
+          # flutter create never overwrites existing files.
+          rm -rf android
           flutter create . --org com.gapshap --project-name app --platforms=android
           rm -rf lib && cp -r /tmp/backup_lib lib
           cp /tmp/backup_pubspec.yaml pubspec.yaml
