@@ -52,12 +52,11 @@ class ChatService {
         .snapshots();
   }
 
-  // User ki chat list
+  // User ki chat list — composite index ki zaroorat nahi (client side sort)
   Stream<QuerySnapshot> chatListStream(String uid) {
     return _db
         .collection('chats')
         .where('participants', arrayContains: uid)
-        .orderBy('lastMessageTime', descending: true)
         .snapshots();
   }
 
