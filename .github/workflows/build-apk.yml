@@ -48,8 +48,8 @@ jobs:
           for p2 in ['android/app/build.gradle.kts', 'android/app/build.gradle']:
               if os.path.exists(p2):
                   s2 = open(p2).read()
-                  s2 = s2.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 34')
-                  s2 = s2.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 34')
+                  s2 = s2.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 36')
+                  s2 = s2.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 36')
                   open(p2, 'w').write(s2)
                   print('patched', p2)
           EOF
