@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'otp_screen.dart';
+import 'home_screen.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({super.key});
@@ -15,7 +16,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   bool _loading = false;
 
   void _sendOtp() async {
-    final phone = _phoneController.text.trim();
+    final phone = _phoneController.text.trim().replaceAll(' ', '');
     if (phone.isEmpty || phone.length < 10) {
       _showMsg('Sahi phone number likhein (e.g. 03001234567)');
       return;
@@ -33,6 +34,16 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           MaterialPageRoute(
             builder: (_) => OtpScreen(verificationId: verificationId, phone: fullPhone),
           ),
+        );
+      },
+      onAutoVerified: () {
+        // Test number: Firebase ne foran login kar diya, seedha home
+        if (!mounted) return;
+        setState(() => _loading = false);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (_) => false,
         );
       },
       onError: (error) {
