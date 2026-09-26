@@ -47,6 +47,9 @@ jobs:
           [ -f "$f" ] || f=android/app/build.gradle
           sed -i -E 's/compileSdk *=.*/compileSdk = 36/; s/compileSdkVersion .*/compileSdkVersion 36/' "$f"
           grep -n "compileSdk" "$f"
+          # minSdk 23 (firebase_auth 5.x requires it)
+          sed -i -E 's/minSdk *=.*/minSdk = 23/; s/minSdkVersion .*/minSdkVersion 23/' "$f"
+          grep -n "minSdk" "$f"
           # Set app display name and add internet permission (needed for Firebase)
           python3 - <<'EOF'
           p = 'android/app/src/main/AndroidManifest.xml'
