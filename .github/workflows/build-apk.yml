@@ -26,16 +26,29 @@ jobs:
 
       - name: Regenerate Android project files
         run: |
+          # Back up our Dart code, pubspec and custom app icons
+          # (flutter create would overwrite them)
           cp -r lib /tmp/backup_lib
           cp pubspec.yaml /tmp/backup_pubspec.yaml
           cp -r android/app/src/main/res /tmp/backup_res
+          # Generate proper Android scaffold with the real Flutter SDK.
+          # Package name must stay com.gapshap.app (matches Firebase).
+          # Delete the incompatible hand-written android/ folder first:
+          # flutter create never overwrites existing files.
           rm -rf android
           flutter create . --org com.gapshap --project-name app --platforms=android
+          # Restore our code, pubspec and icons
           rm -rf lib && cp -r /tmp/backup_lib lib
           cp /tmp/backup_pubspec.yaml pubspec.yaml
           rm -rf android/app/src/main/res && cp -r /tmp/backup_res android/app/src/main/res
+          # Bump compileSdk to 36 (required by firebase/androidx libs).
+          # Done with sed (not python) so no indentation pitfalls.
+          f=android/app/build.gradle.kts
+          [ -f "$f" ] || f=android/app/build.gradle
+          sed -i -E 's/compileSdk *=.*/compileSdk = 36/; s/compileSdkVersion .*/compileSdkVersion 36/' "$f"
+          grep -n "compileSdk" "$f"
+          # Set app display name and add internet permission (needed for Firebase)
           python3 - <<'EOF'
-          import os, re
           p = 'android/app/src/main/AndroidManifest.xml'
           s = open(p).read()
           s = s.replace('android:label="app"', 'android:label="GapShap"')
@@ -45,13 +58,6 @@ jobs:
                   '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.INTERNET"/>')
           open(p, 'w').write(s)
           print('manifest patched')
-          for p2 in ['android/app/build.gradle.kts', 'android/app/build.gradle']:
-              if os.path.exists(p2):
-                  s2 = open(p2).read()
-                                    s2 = re.sub('compileSdk *=.*', 'compileSdk  = 36', s2)
-                                    s2 = re.sub('compileSdkVersion .*', 'compileSdkVersion 36', s2)
-                  open(p2, 'w').write(s2)
-                  print('patched', p2)
           EOF
 
       - name: Install dependencies
