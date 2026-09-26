@@ -113,7 +113,19 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
-          final docs = snap.data!.docs;
+          // Nayi chat sab se upar (client side sort, koi index nahi chahiye)
+          final docs = snap.data!.docs.toList()
+            ..sort((a, b) {
+              final da = a.data() as Map<String, dynamic>;
+              final db = b.data() as Map<String, dynamic>;
+              final ta = da['lastMessageTime'];
+              final tb = db['lastMessageTime'];
+              final dta =
+                  ta is Timestamp ? ta.toDate() : DateTime.fromMillisecondsSinceEpoch(0);
+              final dtb =
+                  tb is Timestamp ? tb.toDate() : DateTime.fromMillisecondsSinceEpoch(0);
+              return dtb.compareTo(dta);
+            });
           if (docs.isEmpty) {
             return const Center(
               child: Text('Abhi koi chat nahi\nNeeche + dabayein',
