@@ -100,6 +100,18 @@ class _HomeScreenState extends State<HomeScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: _chat.chatListStream(myUid),
         builder: (context, snap) {
+          if (snap.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Chat list mein masla:\n${snap.error}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          }
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final docs = snap.data!.docs;
           if (docs.isEmpty) {
